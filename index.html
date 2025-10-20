@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Ahmed Heweide | Operations & Hospitality Expert Dashboard</title>
+    <!-- تحميل Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* تعيين خط Cairo كخط أساسي يدعم العربية والإنجليزية */
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap');
+        :root {
+            font-family: 'Cairo', sans-serif;
+        }
+        /* التنسيق الأساسي للجسم */
+        body {
+            background-color: #0d1117; /* GitHub dark mode style */
+            color: #e6edf3; /* Basic light text color */
+            line-height: 1.6;
+            transition: direction 0.3s;
+        }
+        /* نمط خاص لبطاقات البيانات */
+        .data-card {
+            background-color: #161b22; /* Slightly darker background for cards */
+            box-shadow: 0 4px 12px rgba(0, 255, 170, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .data-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 255, 170, 0.2);
+        }
+        /* لون مميز للـ ROI/النمو (Teal/أخضر مائي) */
+        .accent-color {
+            color: #00ffaa;
+        }
+        .accent-bg {
+            background-color: #00ffaa;
+        }
+
+        /* تنسيق الخط الزمني - سيتم تحديده بواسطة JavaScript بناءً على الاتجاه */
+        .timeline-item {
+            position: relative;
+            padding-bottom: 2.5rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            top: 1.5rem;
+            width: 16px;
+            height: 16px;
+            background-color: #0d1117;
+            border: 3px solid #00ffaa;
+            border-radius: 50%;
+            z-index: 10;
+        }
+        
+        /* RTL styles (Arabic) */
+        [dir="rtl"] .timeline-item {
+            border-right: 4px solid #161b22;
+            padding-right: 2rem;
+            margin-right: 1rem;
+            text-align: right;
+        }
+        [dir="rtl"] .timeline-item::before {
+            right: -10px;
+            left: auto;
+        }
+        [dir="rtl"] .list-disc {
+            list-style-position: inside;
+            padding-right: 1rem;
+            margin-right: 0.5rem;
+        }
+        [dir="rtl"] .md\:text-left {
+            text-align: right; /* Override Tailwind for Arabic */
+        }
+        [dir="rtl"] .md\:justify-start {
+            justify-content: flex-end; /* Override Tailwind for Arabic */
+        }
+        [dir="rtl"] .ml-4 {
+            margin-left: 0;
+            margin-right: 1rem;
+        }
+        
+        /* LTR styles (English) */
+        [dir="ltr"] .timeline-item {
+            border-left: 4px solid #161b22;
+            padding-left: 2rem;
+            margin-left: 1rem;
+            text-align: left;
+        }
+        [dir="ltr"] .timeline-item::before {
+            left: -10px;
+            right: auto;
+        }
+        [dir="ltr"] .list-disc {
+            list-style-position: inside;
+            padding-left: 1rem;
+            margin-left: 0.5rem;
+        }
+        [dir="ltr"] .md\:text-left {
+            text-align: left;
+        }
+        [dir="ltr"] .md\:justify-start {
+            justify-content: flex-start;
+        }
+
+
+        /* فاصل بصري أنيق */
+        .section-divider {
+            height: 2px;
+            width: 10%;
+            background-color: #00ffaa;
+            margin: 4rem auto 0;
+            border-radius: 9999px;
+            opacity: 0.3;
+        }
+        /* تنسيق الأيقونة (لضمان عملها كزر) */
+        .burger-icon {
+            cursor: pointer;
+            user-select: none;
+        }
+        /* تنسيق قائمة التنقل في وضع الهاتف */
+        #mobile-menu {
+            transition: max-height 0.3s ease-out;
+            max-height: 0;
+            overflow: hidden;
+        }
+        .mobile-menu-open {
+            max-height: 500px !important; /* Sufficient height */
+        }
+
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8" dir="ltr">
+
+    <!-- شريط التنقل (Header) -->
+    <header class="flex flex-col max-w-7xl mx-auto py-4 border-b border-gray-700 sticky top-0 z-50 bg-[#0d1117] bg-opacity-95 backdrop-blur-sm">
+        
+        <!-- الصف الأول: الشعار وأيقونة البرجر ومعلومات الاتصال السريعة -->
+        <div class="flex justify-between items-center w-full">
+            <h1 class="text-3xl font-extrabold accent-color">
+                <span class="text-4xl">A</span>H. <span class="text-sm font-normal text-gray-500 mr-2 hidden md:inline" data-i18n="header_subtitle">Operations Manager</span>
+            </h1>
+            
+            <div class="flex items-center space-x-4">
+                <!-- زر تبديل اللغة -->
+                <button id="lang-toggle-button" class="px-3 py-1 text-sm rounded-full border border-gray-600 hover:bg-gray-800 transition duration-300 font-semibold text-gray-300" data-i18n="lang_button">
+                    العربية
+                </button>
+                
+                <!-- زر قائمة التنقل للهاتف -->
+                <button id="menu-button" class="md:hidden text-2xl burger-icon" aria-expanded="false" aria-controls="mobile-menu">
+                    &#x2261;
+                </button>
+            </div>
+            
+            
+            <!-- بيانات الاتصال السريعة في الهيدر (للسطح المكتب فقط) -->
+            <div class="hidden md:flex items-center space-x-6 text-sm font-medium" id="header-contact-info">
+                <a href="tel:01029725209" class="hover:text-accent-color transition duration-200">
+                    <span class="mr-1">&#x260E;</span> 01029725209
+                </a>
+                <a href="mailto:ahmed.heweide@gmail.com" class="hover:text-accent-color transition duration-200">
+                    <span class="mr-1">&#x2709;</span> ahmed.heweide@gmail.com
+                </a>
+                <a href="#contact" class="px-4 py-2 rounded-lg accent-bg text-gray-900 font-bold hover:bg-opacity-80 transition duration-300" data-i18n="contact_now_btn">
+                    Contact Now
+                </a>
+            </div>
+        </div>
+
+        <!-- قائمة التنقل الكلاسيكية (للسطح المكتب فقط) -->
+        <nav class="space-x-4 text-sm font-medium hidden md:flex mt-4 justify-end">
+            <a href="#about" class="hover:text-accent-color transition duration-200" data-i18n="nav_about">About</a>
+            <a href="#kpis" class="hover:text-accent-color transition duration-200" data-i18n="nav_kpis">KPIs</a>
+            <a href="#projects" class="hover:text-accent-color transition duration-200" data-i18n="nav_projects">Projects</a>
+            <a href="#expertise" class="hover:text-accent-color transition duration-200" data-i18n="nav_expertise">Expertise</a>
+            <a href="#career" class="hover:text-accent-color transition duration-200" data-i18n="nav_career">Career</a>
+            <a href="#certifications" class="hover:text-accent-color transition duration-200" data-i18n="nav_certifications">Certifications</a>
+            <a href="#testimonials" class="hover:text-accent-color transition duration-200" data-i18n="nav_testimonials">Testimonials</a>
+        </nav>
+
+        <!-- قائمة التنقل الخاصة بالهاتف (مخفية افتراضياً) -->
+        <nav id="mobile-menu" class="md:hidden flex flex-col items-center mt-4 text-center">
+            <a href="#about" class="py-2 text-base hover:text-accent-color transition duration-200 w-full border-b border-gray-800" data-i18n="nav_about" onclick="toggleMenu()">About</a>
+            <a href="#kpis" class="py-2 text-base hover:text-accent-color transition duration-200 w-full border-b border-gray-800" data-i18n="nav_kpis" onclick="toggleMenu()">KPIs</a>
+            <a href="#projects" class="py-2 text-base hover:text-accent-color transition duration-200 w-full border-b border-gray-800" data-i18n="nav_projects" onclick="toggleMenu()">Projects</a>
+            <a href="#expertise" class="py-2 text-base hover:text-accent-color transition duration-200 w-full border-b border-gray-800" data-i18n="nav_expertise" onclick="toggleMenu()">Expertise</a>
+            <a href="#career" class="py-2 text-base hover:text-accent-color transition duration-200 w-full border-b border-gray-800" data-i18n="nav_career" onclick="toggleMenu()">Career</a>
+            <a href="#certifications" class="py-2 text-base hover:text-accent-color transition duration-200 w-full border-b border-gray-800" data-i18n="nav_certifications" onclick="toggleMenu()">Certifications</a>
+            <a href="#testimonials" class="py-2 text-base hover:text-accent-color transition duration-200 w-full border-b border-gray-800" data-i18n="nav_testimonials" onclick="toggleMenu()">Testimonials</a>
+            <!-- إضافة أرقام التواصل في قائمة الهاتف -->
+            <div class="flex flex-col items-center py-4 w-full">
+                <a href="tel:01029725209" class="text-sm hover:text-accent-color transition duration-200 mb-2">
+                    &#x260E; 01029725209
+                </a>
+                <a href="mailto:ahmed.heweide@gmail.com" class="text-sm hover:text-accent-color transition duration-200">
+                    &#x2709; ahmed.heweide@gmail.com
+                </a>
+            </div>
+        </nav>
+
+    </header>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- القسم 1: النبذة الاحترافية (About Me/Hero) -->
+    <!-- ---------------------------------------------------- -->
+    <section id="about" class="max-w-7xl mx-auto mt-12 text-center md:text-left">
+        <div class="max-w-6xl mx-auto p-6 md:p-0 grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+            
+            <!-- العمود الأيمن (النص والزراير) -->
+            <div class="lg:col-span-2">
+                <p class="text-sm font-mono uppercase tracking-widest text-gray-400 mb-4" data-i18n="about_tagline">
+                    Operations Manager | Hospitality & Property Management Expert
+                </p>
+                <h2 class="text-5xl md:text-6xl font-bold mb-6 leading-tight" data-i18n="about_main_title">
+                    Ahmed Heweide: Strategic Leadership for <span class="accent-color">Profit Growth</span>.
+                </h2>
+                <p class="text-xl text-gray-400 mb-10" data-i18n="about_body">
+                    I am a dedicated Operations Manager specializing in hospitality and property management. My focus is on driving operational excellence and financial efficiency. I lead innovative solutions—like developing in-house Property Management Systems (PMS)—to sharply reduce costs and increase revenue. Committed to building strategic partnerships and leading large teams towards corporate objectives.
+                </p>
+                
+                <!-- أزرار الإجراءات الرئيسية -->
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-8 justify-center md:justify-start" id="hero-buttons">
+                    
+                    <!-- زر العمل المطلوب: تحميل السيرة الذاتية (Placeholder for the link) -->
+                    <a href="Ahmed Heweide_Operations_Manager_CV.pdf" download class="inline-block px-8 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition duration-300 transform hover:scale-105" data-i18n="cv_download_btn">
+                        Download CV
+                    </a>
+                    
+                    <a href="https://www.linkedin.com/in/ahmedheweide" target="_blank" class="inline-block px-8 py-3 rounded-xl accent-bg text-gray-900 font-bold hover:bg-opacity-90 transition duration-300 transform hover:scale-105" data-i18n="linkedin_btn">
+                        View LinkedIn
+                    </a>
+                </div>
+
+                <!-- أيقونات التواصل الاجتماعي -->
+                <div class="flex space-x-6 mt-6 justify-center md:justify-start">
+                    <a href="https://www.linkedin.com/in/ahmedheweide" target="_blank" class="text-3xl text-gray-400 hover:text-accent-color transition duration-200" title="LinkedIn">
+                        &#x1F4CD; <!-- Placeholder for LinkedIn icon -->
+                    </a>
+                    <a href="mailto:ahmed.heweide@gmail.com" class="text-3xl text-gray-400 hover:text-accent-color transition duration-200" title="Email">
+                        &#x2709; <!-- Placeholder for Email icon -->
+                    </a>
+                    <a href="tel:01029725209" class="text-3xl text-gray-400 hover:text-accent-color transition duration-200" title="Phone">
+                        &#x260E; <!-- Placeholder for Phone icon -->
+                    </a>
+                </div>
+            </div>
+
+            <!-- العمود الأيسر (الصورة الشخصية) -->
+            <div class="lg:col-span-1 flex justify-center lg:justify-start">
+                <div class="w-64 h-64 rounded-full border-4 border-accent-color p-1 shadow-2xl shadow-[#00ffaa33] overflow-hidden">
+                    <!-- Placeholder: يرجى وضع صورتك الاحترافية هنا -->
+                    <div class="w-full h-full bg-gray-700 flex items-center justify-center text-gray-300 text-lg font-bold" data-i18n="photo_placeholder">
+                        Professional Photo
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- فاصل بصري -->
+    <div class="section-divider"></div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- القسم 2: مقاييس الأداء الرئيسية (KPIs) -->
+    <!-- ---------------------------------------------------- -->
+    <section id="kpis" class="max-w-7xl mx-auto mt-20 md:mt-32">
+        <h3 class="4xl font-bold mb-12 text-center border-b border-gray-800 pb-4" data-i18n="kpis_title">
+            <span class="accent-color">&#x26A1;</span> Tangible Results (Delta Dream)
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            <!-- بطاقة 1: توفير تكاليف الأنظمة (Cost Reduction) - الأهم -->
+            <div class="data-card p-6 rounded-2xl text-left">
+                <p class="text-sm uppercase text-gray-400 mb-2" data-i18n="kpi1_label">Quarterly System Cost Savings</p>
+                <div class="flex items-center justify-between">
+                    <span class="text-5xl font-extrabold text-red-400">750K+</span>
+                    <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13l-3 3m0 0l-3-3m3 3V8m0-5a9 9 0 110 18A9 9 0 0112 3z"></path></svg>
+                </div>
+                <p class="text-gray-500 mt-3 text-sm" data-i18n="kpi1_desc">Saved (EGP) by developing an in-house Property Management System (PMS).</p>
+            </div>
+
+            <!-- بطاقة 2: نمو الحجوزات (Booking Growth) -->
+            <div class="data-card p-6 rounded-2xl text-left">
+                <p class="text-sm uppercase text-gray-400 mb-2" data-i18n="kpi2_label">Annual Booking Growth</p>
+                <div class="flex items-center justify-between">
+                    <span class="text-5xl font-extrabold accent-color">+%20</span>
+                    <svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8m-2 2a9 9 0 11-12 0 9 9 0 0112 0z"></path></svg>
+                </div>
+                <p class="text-gray-500 mt-3 text-sm" data-i18n="kpi2_desc">Increase in bookings vs. previous year (Achieved 6,396 bookings).</p>
+            </div>
+
+            <!-- بطاقة 3: نطاق الإدارة (Scope) -->
+            <div class="data-card p-6 rounded-2xl text-left">
+                <p class="text-sm uppercase text-gray-400 mb-2" data-i18n="kpi3_label">Operational Scope</p>
+                <div class="flex items-center justify-between">
+                    <span class="text-5xl font-extrabold text-gray-50">242+</span>
+                    <svg class="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h-2M5 21h2m7-8h1m-1 0h-1m-1 0h-1m-1 0h-1m1 0V9m0 4v4m0-4v-4m0 8h-1m1-8v-4m0 8v4"></path></svg>
+                </div>
+                <p class="text-gray-500 mt-3 text-sm" data-i18n="kpi3_desc">Managed: 200 chalets, 2 hotels (42 suites/rooms), and 1 Oriental grill restaurant.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- فاصل بصري -->
+    <div class="section-divider"></div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- القسم 3: المشاريع (Projects) - دراسات حالة -->
+    <!-- ---------------------------------------------------- -->
+    <section id="projects" class="max-w-7xl mx-auto mt-20 md:mt-32">
+        <h3 class="4xl font-bold mb-12 text-center border-b border-gray-800 pb-4" data-i18n="projects_title">
+            <span class="accent-color">&#x270F;</span> Projects & Success Stories
+        </h3>
+        <div class="space-y-12">
+            
+            <!-- مشروع 1: تطوير نظام إدارة الممتلكات (PMS) -->
+            <div class="data-card p-8 rounded-3xl grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                <div class="lg:col-span-1">
+                    <p class="text-xs uppercase font-semibold text-gray-500 mb-1" data-i18n="project1_tag">Operational Technology</p>
+                    <h4 class="text-2xl font-bold accent-color" data-i18n="project1_title">Custom In-House PMS</h4>
+                    <p class="text-gray-400 mt-2" data-i18n="project1_desc">Led the development of a software solution to reduce reliance on expensive external systems.</p>
+                    <span class="inline-block mt-4 text-xs font-mono px-3 py-1 rounded-full bg-red-800 text-red-300" data-i18n="project1_label">Cost Reduction</span>
+                </div>
+                <div class="lg:col-span-2 space-y-4 text-left">
+                    <ul class="list-disc list-inside space-y-2 text-gray-300 ml-4">
+                        <li data-i18n="project1_item1">**Challenge:** The previous PMS system cost EGP 900K quarterly.</li>
+                        <li data-i18n="project1_item2">**Solution:** I led the development of an internal PMS, from design to execution.</li>
+                        <li data-i18n="project1_item3">**Result:** Quarterly operational cost was reduced to simple annual hosting fees, achieving savings of over **EGP 750K per quarter** after covering the one-time development cost (EGP 150K).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- مشروع 2: التوسع ونمو الإيرادات -->
+            <div class="data-card p-8 rounded-3xl grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                <div class="lg:col-span-1">
+                    <p class="text-xs uppercase font-semibold text-gray-500 mb-1" data-i18n="project2_tag">Strategic Growth</p>
+                    <h4 class="2xl font-bold text-gray-50" data-i18n="project2_title">Portfolio Expansion & +20% Growth</h4>
+                    <p class="text-gray-400 mt-2" data-i18n="project2_desc">Effective strategies to increase revenue and expand the base of managed properties.</p>
+                    <span class="inline-block mt-4 text-xs font-mono px-3 py-1 rounded-full bg-green-800 text-green-300" data-i18n="project2_label">Revenue Increase</span>
+                </div>
+                <div class="lg:col-span-2 space-y-4 text-left">
+                    <ul class="list-disc list-inside space-y-2 text-gray-300 ml-4">
+                        <li data-i18n="project2_item1">**Mission:** Achieve growth in bookings and expand the managed property portfolio.</li>
+                        <li data-i18n="project2_item2">**Actions:** Managed owner relations and strategic partnerships to expand the company's portfolio.</li>
+                        <li data-i18n="project2_item3">**Result:** A jump in annual revenue, achieving **6,396 bookings**, representing a **20% growth** over the previous year.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- فاصل بصري -->
+    <div class="section-divider"></div>
+    
+    <!-- ---------------------------------------------------- -->
+    <!-- القسم 4: التوصيات (Testimonials) -->
+    <!-- ---------------------------------------------------- -->
+    <section id="testimonials" class="max-w-7xl mx-auto mt-20 md:mt-32">
+        <h3 class="4xl font-bold mb-12 text-center border-b border-gray-800 pb-4" data-i18n="testimonials_title">
+            <span class="accent-color">&#x2b50;</span> What Partners and Managers Say
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- توصية 1: Placeholder for Former Manager -->
+            <div class="data-card p-8 rounded-2xl border-l-4 border-accent-color text-left">
+                <p class="text-2xl text-gray-300 mb-4 italic" data-i18n="testimonial1_quote">
+                    "Ahmed possesses clear strategic leadership. His ability to identify cost-saving opportunities—such as the in-house PMS project—was crucial in achieving high profitable sustainability."
+                </p>
+                <div class="flex items-center mt-6">
+                    <span class="text-3xl bg-gray-700 w-10 h-10 flex items-center justify-center rounded-full mr-3">👤</span>
+                    <div>
+                        <p class="font-bold text-gray-50" data-i18n="testimonial1_name">Former Manager (Placeholder)</p>
+                        <p class="text-sm text-gray-500" data-i18n="testimonial1_role">CEO, Delta Dream</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- توصية 2: Placeholder for Partner/Client -->
+            <div class="data-card p-8 rounded-2xl border-l-4 border-accent-color text-left">
+                <p class="text-2xl text-gray-300 mb-4 italic" data-i18n="testimonial2_quote">
+                    "His relationship management skills allowed us to expand confidently. Ahmed handles owners and partners with high professionalism, ensuring sustainable growth in our property portfolio."
+                </p>
+                <div class="flex items-center mt-6">
+                    <span class="3xl bg-gray-700 w-10 h-10 flex items-center justify-center rounded-full mr-3">👥</span>
+                    <div>
+                        <p class="font-bold text-gray-50" data-i18n="testimonial2_name">Partner (Placeholder)</p>
+                        <p class="text-sm text-gray-500" data-i18n="testimonial2_role">Major Property Owner</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="text-center text-gray-500 mt-8 text-sm" data-i18n="testimonials_footer">
+            More verified testimonials are available on my <a href="https://www.linkedin.com/in/ahmedheweide" target="_blank" class="accent-color hover:underline">LinkedIn</a> page.
+        </p>
+    </section>
+
+    <!-- فاصل بصري -->
+    <div class="section-divider"></div>
+
+
+    <!-- ---------------------------------------------------- -->
+    <!-- القسم 5: المهارات الجوهرية (Core Expertise) -->
+    <!-- ---------------------------------------------------- -->
+    <section id="expertise" class="max-w-7xl mx-auto mt-20 md:mt-32">
+        <h3 class="4xl font-bold mb-12 text-center border-b border-gray-800 pb-4" data-i18n="expertise_title">
+            <span class="accent-color">&#x2699;</span> Core Expertise
+        </h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            
+            <!-- مهارة 1: Business Relationship Management -->
+            <div class="p-4 rounded-xl border border-gray-700 hover:border-accent-color transition duration-300">
+                <span class="3xl accent-color mb-2 inline-block">&#x1F465;</span>
+                <h4 class="text-lg font-semibold mb-1" data-i18n="skill1_title">Partner Relations</h4>
+                <p class="text-gray-400 text-xs" data-i18n="skill1_desc">Portfolio expansion through strategic partnerships.</p>
+            </div>
+
+            <!-- مهارة 2: Project Management -->
+            <div class="p-4 rounded-xl border border-gray-700 hover:border-accent-color transition duration-300">
+                <span class="3xl accent-color mb-2 inline-block">&#x1F4C4;</span>
+                <h4 class="text-lg font-semibold mb-1" data-i18n="skill2_title">Project Management</h4>
+                <p class="text-gray-400 text-xs" data-i18n="skill2_desc">Leading critical projects like in-house PMS development end-to-end.</p>
+            </div>
+
+            <!-- مهارة 3: Financial Analysis & Cost Reduction -->
+            <div class="p-4 rounded-xl border border-gray-700 hover:border-accent-color transition duration-300">
+                <span class="3xl accent-color mb-2 inline-block">&#x1F4B8;</span>
+                <h4 class="text-lg font-semibold mb-1" data-i18n="skill3_title">Cost Reduction</h4>
+                <p class="text-gray-400 text-xs" data-i18n="skill3_desc">Achieving multi-million EGP savings and ROI analysis.</p>
+            </div>
+
+            <!-- مهارة 4: Strategic Planning -->
+            <div class="p-4 rounded-xl border border-gray-700 hover:border-accent-color transition duration-300">
+                <span class="3xl accent-color mb-2 inline-block">&#x1F52E;</span>
+                <h4 class="text-lg font-semibold mb-1" data-i18n="skill4_title">Strategic Planning</h4>
+                <p class="text-gray-400 text-xs" data-i18n="skill4_desc">Full-authority decision making and defining future corporate plans.</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center mt-6">
+            <!-- مهارة 5: Team Leadership -->
+            <div class="p-4 rounded-xl border border-gray-700 hover:border-accent-color transition duration-300">
+                <span class="3xl accent-color mb-2 inline-block">&#x1F9D1;&#x200D;&#x1F4BB;</span>
+                <h4 class="text-lg font-semibold mb-1" data-i18n="skill5_title">Team Leadership</h4>
+                <p class="text-gray-400 text-xs" data-i18n="skill5_desc">Experienced in leading large teams and managing HR efficiently.</p>
+            </div>
+
+            <!-- مهارة 6: Hotel PMS Operations -->
+            <div class="p-4 rounded-xl border border-gray-700 hover:border-accent-color transition duration-300">
+                <span class="3xl accent-color mb-2 inline-block">&#x1F3D8;</span>
+                <h4 class="text-lg font-semibold mb-1" data-i18n="skill6_title">Hotel PMS</h4>
+                <p class="text-gray-400 text-xs" data-i18n="skill6_desc">Deep expertise in hotel operations and custom PMS development.</p>
+            </div>
+            
+            <!-- مهارة 7: Problem-Solving -->
+            <div class="p-4 rounded-xl border border-gray-700 hover:border-accent-color transition duration-300">
+                <span class="3xl accent-color mb-2 inline-block">&#x1F50D;</span>
+                <h4 class="text-lg font-semibold mb-1" data-i18n="skill7_title">Problem-Solving</h4>
+                <p class="text-gray-400 text-xs" data-i18n="skill7_desc">Designing and implementing tailored solutions to address operational gaps.</p>
+            </div>
+            
+            <!-- مهارة 8: Client & Stakeholder Relations -->
+            <div class="p-4 rounded-xl border border-gray-700 hover:border-accent-color transition duration-300">
+                <span class="3xl accent-color mb-2 inline-block">&#x1F4BC;</span>
+                <h4 class="text-lg font-semibold mb-1" data-i18n="skill8_title">Stakeholder Relations</h4>
+                <p class="text-gray-400 text-xs" data-i18n="skill8_desc">Ensuring positive client experience and managing key partnerships.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- فاصل بصري -->
+    <div class="section-divider"></div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- القسم 6: الشهادات والمؤهلات -->
+    <!-- ---------------------------------------------------- -->
+    <section id="certifications" class="max-w-7xl mx-auto mt-20 md:mt-32">
+        <h3 class="4xl font-bold mb-12 text-center border-b border-gray-800 pb-4" data-i18n="certifications_title">
+            <span class="accent-color">&#x1F393;</span> Qualifications & Certifications
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+            <!-- شهادة 1 -->
+            <div class="p-5 rounded-xl border border-gray-700 text-center data-card">
+                <p class="4xl accent-color mb-2">&#x1F4BB;</p>
+                <h4 class="text-lg font-bold mb-1" data-i18n="cert1_title">Managerial Expertise in Hotel PMS Operations</h4>
+                <p class="text-gray-400 text-sm" data-i18n="cert1_desc">Beyond Basics</p>
+            </div>
+
+            <!-- شهادة 2 -->
+            <div class="p-5 rounded-xl border border-gray-700 text-center data-card">
+                <p class="4xl accent-color mb-2">&#x1F4C6;</p>
+                <h4 class="text-lg font-bold mb-1" data-i18n="cert2_title">Quality Management for Operational Excellence</h4>
+                <p class="text-gray-400 text-sm" data-i18n="cert2_desc">Specialized Qualification</p>
+            </div>
+            
+            <!-- شهادة 3 -->
+            <div class="p-5 rounded-xl border border-gray-700 text-center data-card">
+                <p class="4xl accent-color mb-2">&#x1F397;</p>
+                <h4 class="text-lg font-bold mb-1" data-i18n="cert3_title">Front-End Web Development Diploma</h4>
+                <p class="text-gray-400 text-sm" data-i18n="cert3_desc">Web Development</p>
+            </div>
+            
+            <!-- شهادة 4 -->
+            <div class="p-5 rounded-xl border border-gray-700 text-center data-card">
+                <p class="4xl accent-color mb-2">&#x1F9E9;</p>
+                <h4 class="text-lg font-bold mb-1" data-i18n="cert4_title">Programming Fundamentals Diploma</h4>
+                <p class="text-gray-400 text-sm" data-i18n="cert4_desc">Fundamentals</p>
+            </div>
+
+        </div>
+        <p class="text-center text-gray-500 mt-8 text-sm" data-i18n="certifications_footer">
+            Also: Working with Difficult People and AMIDEAST Scholarship.
+        </p>
+    </section>
+
+    <!-- فاصل بصري -->
+    <div class="section-divider"></div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- القسم 7: المسار المهني (Career Path) -->
+    <!-- ---------------------------------------------------- -->
+    <section id="career" class="max-w-7xl mx-auto mt-20 md:mt-32">
+        <h3 class="4xl font-bold mb-12 text-center border-b border-gray-800 pb-4" data-i18n="career_title">
+            <span class="accent-color">&#x23F1;</span> Career Path - Experience History
+        </h3>
+        <div class="max-w-3xl mx-auto space-y-10">
+
+            <!-- الخبرة 1: Operations Manager -->
+            <div class="timeline-item pb-10">
+                <p class="text-sm uppercase text-gray-500 mb-1" data-i18n="career1_date">March 2024 - Present</p>
+                <h4 class="2xl font-bold accent-color" data-i18n="career1_title">Operations Manager</h4>
+                <p class="text-lg font-medium text-gray-300" data-i18n="career1_location">Delta Dream | Egypt</p>
+                <ul class="list-disc list-inside space-y-1 text-gray-400 text-sm mt-3 ml-4" id="career1_list">
+                    <li data-i18n="career1_item1">Full strategic leadership for projects including 200 chalets, two hotels, and a restaurant.</li>
+                    <li data-i18n="career1_item2">Managed a seasonal operational budget of EGP 7.3 million efficiently.</li>
+                    <li data-i18n="career1_item3">Managed owner relations (chalet owners) to expand the company's portfolio.</li>
+                </ul>
+            </div>
+
+            <!-- الخبرة 2: Administrative Coordinator -->
+            <div class="timeline-item pb-10">
+                <p class="text-sm uppercase text-gray-500 mb-1" data-i18n="career2_date">April 2023 - March 2024</p>
+                <h4 class="2xl font-bold text-gray-50" data-i18n="career2_title">Administrative Coordinator</h4>
+                <p class="text-lg font-medium text-gray-300" data-i18n="career2_location">Delta Dream | Egypt</p>
+                <ul class="list-disc list-inside space-y-1 text-gray-400 text-sm mt-3 ml-4" id="career2_list">
+                    <li data-i18n="career2_item1">Achieved efficiency by designing tailored solutions to address deficiencies across departments.</li>
+                    <li data-i18n="career2_item2">Managed human resources and prepared monthly attendance reports.</li>
+                    <li data-i18n="career2_item3">Acted as the main liaison between the company and the operating entity.</li>
+                </ul>
+            </div>
+
+            <!-- الخبرة 3: Social Media Manager (Freelance) -->
+            <div class="timeline-item pb-10">
+                <p class="text-sm uppercase text-gray-500 mb-1" data-i18n="career3_date">April 2023 - March 2024</p>
+                <h4 class="2xl font-bold text-gray-50" data-i18n="career3_title">Social Media Manager (Freelance)</h4>
+                <p class="text-lg font-medium text-gray-300" data-i18n="career3_location">Saudi Arabia</p>
+                <ul class="list-disc list-inside space-y-1 text-gray-400 text-sm mt-3 ml-4" id="career3_list">
+                    <li data-i18n="career3_item1">Developed and executed strategic marketing plans and managed ad campaigns.</li>
+                    <li data-i18n="career3_item2">Analyzed campaign performance data and provided regular reports to management.</li>
+                </ul>
+            </div>
+
+            <!-- التعليم -->
+             <div class="timeline-item pb-10">
+                <p class="text-sm uppercase text-gray-500 mb-1" data-i18n="career4_date">Education</p>
+                <h4 class="2xl font-bold text-gray-50" data-i18n="career4_title">Bachelor of Business Administration (BBA)</h4>
+                <p class="text-lg font-medium text-gray-300" data-i18n="career4_location">Kafr El Sheikh University</p>
+            </div>
+            
+        </div>
+    </section>
+    
+    <!-- فاصل بصري -->
+    <div class="section-divider"></div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- القسم 8: المدونة (Blog) - قيادة فكرية -->
+    <!-- ---------------------------------------------------- -->
+    <section id="blog" class="max-w-7xl mx-auto mt-20 md:mt-32">
+        <h3 class="4xl font-bold mb-12 text-center border-b border-gray-800 pb-4" data-i18n="blog_title">
+            <span class="accent-color">&#x270D;</span> Blog - Operational Leadership Articles
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <!-- مقال 1 (Placeholder) -->
+            <div class="data-card p-6 rounded-2xl cursor-pointer hover:shadow-lg hover:shadow-[#00ffaa33]">
+                <p class="text-xs uppercase text-gray-500 mb-2" data-i18n="blog1_date">March 2025</p>
+                <h4 class="xl font-bold accent-color mb-3" data-i18n="blog1_title">How In-House PMS Technology Turned Our Costs into Investment?</h4>
+                <p class="text-gray-400 text-sm" data-i18n="blog1_desc">In-depth analysis of the PMS system development process and its impact on financial performance.</p>
+                <a href="#" class="text-xs accent-color mt-3 inline-block hover:underline" data-i18n="blog_read_more">Read Article &#x2192;</a>
+            </div>
+
+            <!-- مقال 2 (Placeholder) -->
+            <div class="data-card p-6 rounded-2xl cursor-pointer hover:shadow-lg hover:shadow-[#00ffaa33]">
+                <p class="text-xs uppercase text-gray-500 mb-2" data-i18n="blog2_date">February 2025</p>
+                <h4 class="xl font-bold text-gray-50 mb-3" data-i18n="blog2_title">Executive Leadership: 5 Strategies for 20% Growth in Hospitality.</h4>
+                <p class="text-gray-400 text-sm" data-i18n="blog2_desc">A look at the methodologies adopted by Delta Dream to achieve record booking growth.</p>
+                <a href="#" class="text-xs accent-color mt-3 inline-block hover:underline" data-i18n="blog_read_more">Read Article &#x2192;</a>
+            </div>
+
+            <!-- مقال 3 (Placeholder) -->
+            <div class="data-card p-6 rounded-2xl cursor-pointer hover:shadow-lg hover:shadow-[#00ffaa33]">
+                <p class="text-xs uppercase text-gray-500 mb-2" data-i18n="blog3_date">January 2025</p>
+                <h4 class="xl font-bold text-gray-50 mb-3" data-i18n="blog3_title">The Role of the Administrative Coordinator in Addressing Operational Gaps.</h4>
+                <p class="text-gray-400 text-sm" data-i18n="blog3_desc">An article reviewing the role of administrative coordination as a critical factor for improving operational efficiency.</p>
+                <a href="#" class="text-xs accent-color mt-3 inline-block hover:underline" data-i18n="blog_read_more">Read Article &#x2192;</a>
+            </div>
+
+        </div>
+    </section>
+    
+    <!-- فاصل بصري -->
+    <div class="section-divider"></div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- القسم 9: التواصل (Contact) -->
+    <!-- ---------------------------------------------------- -->
+    <section id="contact" class="max-w-4xl mx-auto mt-20 md:mt-32 p-8 data-card rounded-3xl">
+        <h3 class="4xl font-bold mb-4 text-center" data-i18n="contact_title">
+            <span class="accent-color">|</span> Contact Ahmed Heweide
+        </h3>
+        <p class="text-gray-400 text-center mb-10" data-i18n="contact_desc">
+            For strategic partnership opportunities or consultation on operations and hospitality management, please reach out.
+        </p>
+
+        <!-- نموذج تواصل مبسط (Placeholder) -->
+        <form class="space-y-6 text-left">
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-300 mb-2" data-i18n="contact_name_label">Full Name</label>
+                <input type="text" id="name" name="name" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-accent-color focus:ring focus:ring-accent-color focus:ring-opacity-50" data-i18n-placeholder="contact_name_placeholder" placeholder="Enter your name">
+            </div>
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-300 mb-2" data-i18n="contact_email_label">Email Address</label>
+                <input type="email" id="email" name="email" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-accent-color focus:ring focus:ring-accent-color focus:ring-opacity-50" data-i18n-placeholder="contact_email_placeholder" placeholder="Enter your email">
+            </div>
+            <div>
+                <label for="message" class="block text-sm font-medium text-gray-300 mb-2" data-i18n="contact_message_label">Project Scope / Inquiry</label>
+                <textarea id="message" name="message" rows="4" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-accent-color focus:ring focus:ring-accent-color focus:ring-opacity-50" data-i18n-placeholder="contact_message_placeholder" placeholder="Describe the type of partnership or challenge you are facing"></textarea>
+            </div>
+            <button type="submit" class="w-full px-8 py-3 rounded-xl accent-bg text-gray-900 font-bold hover:bg-opacity-90 transition duration-300 transform hover:scale-[1.01]" data-i18n="contact_submit_btn">
+                Send Message
+            </button>
+        </form>
+    </section>
+
+    <!-- تذييل (Footer) -->
+    <footer class="max-w-7xl mx-auto mt-20 py-8 border-t border-gray-800 text-center text-gray-500 text-sm">
+        <p data-i18n="footer_text1">
+            &copy; 2025 Ahmed Heweide | Operations Manager. Performance-driven Minimalist Design.
+        </p>
+    </footer>
+
+    <script>
+        // دالة JavaScript لفتح وإغلاق قائمة التنقل للهاتف
+        function toggleMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const button = document.getElementById('menu-button');
+            
+            menu.classList.toggle('mobile-menu-open');
+            
+            const isExpanded = menu.classList.contains('mobile-menu-open');
+            button.setAttribute('aria-expanded', isExpanded);
+        }
+
+        // كائنات المحتوى ثنائي اللغة
+        const content = {
+            en: {
+                page_title: "Ahmed Heweide | Operations & Hospitality Expert Dashboard",
+                header_subtitle: "Operations Manager",
+                lang_button: "العربية",
+                contact_now_btn: "Contact Now",
+                nav_about: "About",
+                nav_kpis: "KPIs",
+                nav_projects: "Projects",
+                nav_expertise: "Expertise",
+                nav_career: "Career",
+                nav_certifications: "Certifications",
+                nav_testimonials: "Testimonials",
+                
+                about_tagline: "Operations Manager | Hospitality & Property Management Expert",
+                about_main_title: 'Ahmed Heweide: Strategic Leadership for <span class="accent-color">Profit Growth</span>.',
+                about_body: "I am a dedicated Operations Manager specializing in hospitality and property management. My focus is on driving operational excellence and financial efficiency. I lead innovative solutions—like developing in-house Property Management Systems (PMS)—to sharply reduce costs and increase revenue. Committed to building strategic partnerships and leading large teams towards corporate objectives.",
+                cv_download_btn: "Download CV",
+                linkedin_btn: "View LinkedIn",
+                photo_placeholder: "Professional Photo",
+                
+                kpis_title: '<span class="accent-color">&#x26A1;</span> Tangible Results (Delta Dream)',
+                kpi1_label: "Quarterly System Cost Savings",
+                kpi1_desc: "Saved (EGP) by developing an in-house Property Management System (PMS).",
+                kpi2_label: "Annual Booking Growth",
+                kpi2_desc: "Increase in bookings vs. previous year (Achieved 6,396 bookings).",
+                kpi3_label: "Operational Scope",
+                kpi3_desc: "Managed: 200 chalets, 2 hotels (42 suites/rooms), and 1 Oriental grill restaurant.",
+
+                projects_title: '<span class="accent-color">&#x270F;</span> Projects & Success Stories',
+                project1_tag: "Operational Technology",
+                project1_title: "Custom In-House PMS",
+                project1_desc: "Led the development of a software solution to reduce reliance on expensive external systems.",
+                project1_label: "Cost Reduction",
+                project1_item1: "**Challenge:** The previous PMS system cost EGP 900K quarterly.",
+                project1_item2: "**Solution:** I led the development of an internal PMS, from design to execution.",
+                project1_item3: '**Result:** Quarterly operational cost was reduced to simple annual hosting fees, achieving savings of over **EGP 750K per quarter** after covering the one-time development cost (EGP 150K).',
+
+                project2_tag: "Strategic Growth",
+                project2_title: "Portfolio Expansion & +20% Growth",
+                project2_desc: "Effective strategies to increase revenue and expand the base of managed properties.",
+                project2_label: "Revenue Increase",
+                project2_item1: "**Mission:** Achieve growth in bookings and expand the managed property portfolio.",
+                project2_item2: "**Actions:** Managed owner relations and strategic partnerships to expand the company's portfolio.",
+                project2_item3: '**Result:** A jump in annual revenue, achieving **6,396 bookings**, representing a **20% growth** over the previous year.',
+                
+                testimonials_title: '<span class="accent-color">&#x2b50;</span> What Partners and Managers Say',
+                testimonial1_quote: '"Ahmed possesses clear strategic leadership. His ability to identify cost-saving opportunities—such as the in-house PMS project—was crucial in achieving high profitable sustainability."',
+                testimonial1_name: "Former Manager (Placeholder)",
+                testimonial1_role: "CEO, Delta Dream",
+                testimonial2_quote: '"His relationship management skills allowed us to expand confidently. Ahmed handles owners and partners with high professionalism, ensuring sustainable growth in our property portfolio."',
+                testimonial2_name: "Partner (Placeholder)",
+                testimonial2_role: "Major Property Owner",
+                testimonials_footer: 'More verified testimonials are available on my <a href="https://www.linkedin.com/in/ahmedheweide" target="_blank" class="accent-color hover:underline">LinkedIn</a> page.',
+
+                expertise_title: '<span class="accent-color">&#x2699;</span> Core Expertise',
+                skill1_title: "Partner Relations",
+                skill1_desc: "Portfolio expansion through strategic partnerships.",
+                skill2_title: "Project Management",
+                skill2_desc: "Leading critical projects like in-house PMS development end-to-end.",
+                skill3_title: "Cost Reduction",
+                skill3_desc: "Achieving multi-million EGP savings and ROI analysis.",
+                skill4_title: "Strategic Planning",
+                skill4_desc: "Full-authority decision making and defining future corporate plans.",
+                skill5_title: "Team Leadership",
+                skill5_desc: "Experienced in leading large teams and managing HR efficiently.",
+                skill6_title: "Hotel PMS",
+                skill6_desc: "Deep expertise in hotel operations and custom PMS development.",
+                skill7_title: "Problem-Solving",
+                skill7_desc: "Designing and implementing tailored solutions to address operational gaps.",
+                skill8_title: "Stakeholder Relations",
+                skill8_desc: "Ensuring positive client experience and managing key partnerships.",
+
+                certifications_title: '<span class="accent-color">&#x1F393;</span> Qualifications & Certifications',
+                cert1_title: "Managerial Expertise in Hotel PMS Operations",
+                cert1_desc: "Beyond Basics",
+                cert2_title: "Quality Management for Operational Excellence",
+                cert2_desc: "Specialized Qualification",
+                cert3_title: "Front-End Web Development Diploma",
+                cert3_desc: "Web Development",
+                cert4_title: "Programming Fundamentals Diploma",
+                cert4_desc: "Fundamentals",
+                certifications_footer: "Also: Working with Difficult People and AMIDEAST Scholarship.",
+
+                career_title: '<span class="accent-color">&#x23F1;</span> Career Path - Experience History',
+                career1_date: "March 2024 - Present",
+                career1_title: "Operations Manager",
+                career1_location: "Delta Dream | Egypt",
+                career1_item1: "Full strategic leadership for projects including 200 chalets, two hotels, and a restaurant.",
+                career1_item2: "Managed a seasonal operational budget of EGP 7.3 million efficiently.",
+                career1_item3: "Managed owner relations (chalet owners) to expand the company's portfolio.",
+                
+                career2_date: "April 2023 - March 2024",
+                career2_title: "Administrative Coordinator",
+                career2_location: "Delta Dream | Egypt",
+                career2_item1: "Achieved efficiency by designing tailored solutions to address deficiencies across departments.",
+                career2_item2: "Managed human resources and prepared monthly attendance reports.",
+                career2_item3: "Acted as the main liaison between the company and the operating entity.",
+
+                career3_date: "April 2023 - March 2024",
+                career3_title: "Social Media Manager (Freelance)",
+                career3_location: "Saudi Arabia",
+                career3_item1: "Developed and executed strategic marketing plans and managed ad campaigns.",
+                career3_item2: "Analyzed campaign performance data and provided regular reports to management.",
+
+                career4_date: "Education",
+                career4_title: "Bachelor of Business Administration (BBA)",
+                career4_location: "Kafr El Sheikh University",
+
+                blog_title: '<span class="accent-color">&#x270D;</span> Blog - Operational Leadership Articles',
+                blog1_date: "March 2025",
+                blog1_title: "How In-House PMS Technology Turned Our Costs into Investment?",
+                blog1_desc: "In-depth analysis of the PMS system development process and its impact on financial performance.",
+                blog2_date: "February 2025",
+                blog2_title: "Executive Leadership: 5 Strategies for 20% Growth in Hospitality.",
+                blog2_desc: "A look at the methodologies adopted by Delta Dream to achieve record booking growth.",
+                blog3_date: "January 2025",
+                blog3_title: "The Role of the Administrative Coordinator in Addressing Operational Gaps.",
+                blog3_desc: "An article reviewing the role of administrative coordination as a critical factor for improving operational efficiency.",
+                blog_read_more: "Read Article →",
+
+                contact_title: '<span class="accent-color">|</span> Contact Ahmed Heweide',
+                contact_desc: "For strategic partnership opportunities or consultation on operations and hospitality management, please reach out.",
+                contact_name_label: "Full Name",
+                contact_name_placeholder: "Enter your name",
+                contact_email_label: "Email Address",
+                contact_email_placeholder: "Enter your email",
+                contact_message_label: "Project Scope / Inquiry",
+                contact_message_placeholder: "Describe the type of partnership or challenge you are facing",
+                contact_submit_btn: "Send Message",
+
+                footer_text1: '&copy; 2025 Ahmed Heweide | Operations Manager. Performance-driven Minimalist Design.',
+            },
+            ar: {
+                page_title: "أحمد حويدة | لوحة تحكم خبير العمليات والضيافة",
+                header_subtitle: "مدير العمليات",
+                lang_button: "English",
+                contact_now_btn: "تواصل الآن",
+                nav_about: "النبذة",
+                nav_kpis: "الإنجازات",
+                nav_projects: "المشاريع",
+                nav_expertise: "المهارات",
+                nav_career: "المسار المهني",
+                nav_certifications: "الشهادات",
+                nav_testimonials: "التوصيات",
+                
+                about_tagline: "مدير عمليات | خبير عقارات وضيافة",
+                about_main_title: 'أحمد حويدة: <span class="accent-color">القيادة الاستراتيجية</span> لتحويل التحديات إلى <span class="text-gray-300">نمو ربحي</span>.',
+                about_body: "أنا متخصص في صناعة الضيافة بخبرة تزيد عن عامين، أهدف إلى تحقيق التميز التشغيلي والكفاءة المالية. أركز على تطوير حلول مبتكرة—مثل أنظمة إدارة الممتلكات (PMS) الداخلية—لخفض التكاليف بشكل حاد ودفع نمو الإيرادات. أنا ملتزم ببناء الشراكات الاستراتيجية وقيادة الفرق الكبيرة نحو الأهداف الموضوعة.",
+                cv_download_btn: "تحميل السيرة الذاتية",
+                linkedin_btn: "شاهد ملفي على LinkedIn",
+                photo_placeholder: "صورة احترافية",
+
+                kpis_title: '<span class="accent-color">&#x26A1;</span> نتائج وإنجازات ملموسة (Delta Dream)',
+                kpi1_label: "توفير تكاليف ربع سنوية للأنظمة",
+                kpi1_desc: "تم توفيرها (بالجنيه المصري) عبر تطوير نظام إدارة الممتلكات (PMS) الداخلي.",
+                kpi2_label: "نمو الحجوزات السنوي",
+                kpi2_desc: "زيادة في الحجوزات مقارنة بالعام السابق (تحقيق 6,396 حجز).",
+                kpi3_label: "نطاق الإدارة والتشغيل",
+                kpi3_desc: "إدارة: 200 شاليه، فندقين (42 غرفة وجناح)، ومطعم شرقي.",
+
+                projects_title: '<span class="accent-color">&#x270F;</span> المشاريع وقصص النجاح',
+                project1_tag: "تكنولوجيا العمليات",
+                project1_title: "نظام PMS الداخلي المخصص",
+                project1_desc: "قيادة تطوير حل برمجي لخفض الاعتماد على الأنظمة الخارجية باهظة الثمن.",
+                project1_label: "خفض التكاليف",
+                project1_item1: "**التحدي:** تكلفة تشغيل نظام PMS الحالي بلغت 900,000 ج.م. ربع سنويًا.",
+                project1_item2: "**الحل:** قمت بقيادة مشروع تطوير نظام PMS داخلي، بدءاً من التصميم وحتى التنفيذ.",
+                project1_item3: '**النتيجة:** تقليص التكلفة التشغيلية الربع سنوية إلى مصاريف استضافة سنوية بسيطة، مما حقق وفورات تزيد عن **750 ألف ج.م. في الربع الواحد** بعد تغطية تكلفة التطوير لمرة واحدة (150 ألف ج.م.).',
+
+                project2_tag: "النمو الاستراتيجي",
+                project2_title: "توسيع المحفظة وتحقيق +20% نمو",
+                project2_desc: "استراتيجيات فعالة لزيادة الإيرادات وتوسيع قاعدة الممتلكات المدارة.",
+                project2_label: "زيادة الإيرادات",
+                project2_item1: "**المهمة:** تحقيق نمو في أعداد الحجوزات وزيادة محفظة العقارات المدارة.",
+                project2_item2: "**الإجراءات:** إدارة علاقات الملاك والشراكات الاستراتيجية لتوسيع محفظة الشركة.",
+                project2_item3: '**النتيجة:** قفزة في الإيرادات السنوية، وتحقيق **6,396 حجز**، وهو ما يمثل **نمو بنسبة 20%** عن العام السابق.',
+                
+                testimonials_title: '<span class="accent-color">&#x2b50;</span> ما يقوله الشركاء والمدراء',
+                testimonial1_quote: '"أحمد يتمتع بقيادة استراتيجية واضحة. قدرته على تحديد الفرص لخفض التكاليف—مثل مشروع PMS الداخلي—كانت عاملاً حاسماً في تحقيق استدامة ربحية عالية."',
+                testimonial1_name: "المدير السابق (وهمي)",
+                testimonial1_role: "الرئيس التنفيذي، شركة دلتا دريم",
+                testimonial2_quote: '"إن مهاراته في إدارة العلاقات أتاحت لنا التوسع بثقة. يتعامل أحمد مع الملاك والشركاء بمهنية عالية، مما يضمن نمواً مستداماً في محفظتنا العقارية."',
+                testimonial2_name: "أحد الشركاء (وهمي)",
+                testimonial2_role: "مالك عقارات رئيسي",
+                testimonials_footer: 'يمكن الاطلاع على المزيد من التوصيات الموثقة على صفحتي في <a href="https://www.linkedin.com/in/ahmedheweide" target="_blank" class="accent-color hover:underline">LinkedIn</a>.',
+
+                expertise_title: '<span class="accent-color">&#x2699;</span> المهارات الجوهرية',
+                skill1_title: "إدارة علاقات الشركاء",
+                skill1_desc: "توسيع المحفظة عبر بناء الشراكات الاستراتيجية.",
+                skill2_title: "إدارة المشاريع",
+                skill2_desc: "قيادة مشاريع حاسمة مثل تطوير أنظمة PMS من البداية للنهاية.",
+                skill3_title: "خفض التكاليف",
+                skill3_desc: "توفير تكاليف تشغيلية بملايين الجنيهات وتحليل العائد على الاستثمار.",
+                skill4_title: "التخطيط الاستراتيجي",
+                skill4_desc: "صنع القرار ذو السلطة الكاملة وتحديد الخطط المستقبلية للشركة.",
+                skill5_title: "قيادة الفرق",
+                skill5_desc: "خبرة في قيادة الفرق الكبيرة وإدارة الموارد البشرية بكفاءة.",
+                skill6_title: "أنظمة الضيافة (PMS)",
+                skill6_desc: "خبرة عميقة في العمليات الفندقية وتطوير أنظمة PMS مخصصة.",
+                skill7_title: "حل المشكلات",
+                skill7_desc: "تصميم وتنفيذ حلول مخصصة لسد الثغرات التشغيلية.",
+                skill8_title: "علاقات الشُركاء",
+                skill8_desc: "ضمان تجربة عملاء إيجابية والتعامل مع الشركاء الرئيسيين.",
+
+                certifications_title: '<span class="accent-color">&#x1F393;</span> المؤهلات والشهادات',
+                cert1_title: "Managerial Expertise in Hotel PMS Operations",
+                cert1_desc: "ما وراء الأساسيات",
+                cert2_title: "Quality Management for Operational Excellence",
+                cert2_desc: "مؤهل متخصص في الجودة",
+                cert3_title: "Front-End Web Development Diploma",
+                cert3_desc: "تطوير الويب",
+                cert4_title: "Programming Fundamentals Diploma",
+                cert4_desc: "أساسيات البرمجة",
+                certifications_footer: "بالإضافة إلى: العمل مع الأشخاص الصعبين ومنحة AMIDEAST.",
+
+                career_title: '<span class="accent-color">&#x23F1;</span> المسار المهني - تاريخ الخبرات',
+                career1_date: "مارس 2024 - الآن",
+                career1_title: "مدير العمليات",
+                career1_location: "Delta Dream | مصر",
+                career1_item1: "قيادة استراتيجية كاملة للمشاريع بما يشمل 200 شاليه وفندقين ومطعم.",
+                career1_item2: "إدارة ميزانية تشغيل موسمية قدرها 7.3 مليون ج.م. بكفاءة وفعالية.",
+                career1_item3: "إدارة علاقات الشركاء (ملاك الشاليهات) لتوسيع محفظة الشركة.",
+                
+                career2_date: "أبريل 2023 - مارس 2024",
+                career2_title: "المنسق الإداري",
+                career2_location: "Delta Dream | مصر",
+                career2_item1: "تحقيق الكفاءة عبر تصميم حلول مخصصة لسد الثغرات في الأقسام المختلفة.",
+                career2_item2: "إدارة الموارد البشرية وإعداد تقارير الحضور الشهرية.",
+                career2_item3: "عمل كمنسق رئيسي بين الشركة والجهة المشغلة.",
+
+                career3_date: "أبريل 2023 - مارس 2024",
+                career3_title: "مدير وسائل التواصل الاجتماعي (مستقل)",
+                career3_location: "المملكة العربية السعودية",
+                career3_item1: "وضع وتنفيذ خطط التسويق الاستراتيجية وتصميم وإدارة الحملات الإعلانية.",
+                career3_item2: "تحليل أداء الحملات وتقديم التقارير الدورية للإدارة.",
+
+                career4_date: "التعليم",
+                career4_title: "بكالوريوس إدارة الأعمال (BBA)",
+                career4_location: "جامعة كفر الشيخ",
+
+                blog_title: '<span class="accent-color">&#x270D;</span> المدونة - مقالات في الإدارة التشغيلية',
+                blog1_date: "مارس 2025",
+                blog1_title: "كيف حولت تقنية الـ PMS الداخلية تكاليفنا إلى استثمار؟",
+                blog1_desc: "تحليل معمق لعملية تطوير نظام إدارة الممتلكات وتأثيره على الأداء المالي.",
+                blog2_date: "فبراير 2025",
+                blog2_title: "القيادة الإدارية: 5 استراتيجيات لتحقيق نمو 20% في الضيافة.",
+                blog2_desc: "نظرة على المنهجيات التي اعتمدتها Delta Dream لتحقيق نمو قياسي في الحجوزات.",
+                blog3_date: "يناير 2025",
+                blog3_title: "دور المنسق الإداري في معالجة الثغرات التشغيلية.",
+                blog3_desc: "مقال يستعرض دور التنسيق الإداري كعامل حاسم لتحسين كفاءة العمليات.",
+                blog_read_more: "قراءة المقال ←",
+
+                contact_title: '<span class="accent-color">|</span> تواصل مع أحمد حويدة',
+                contact_desc: "للبحث عن شراكة استراتيجية أو استشارة في إدارة العمليات والضيافة، تفضل بالتواصل.",
+                contact_name_label: "الاسم الكامل",
+                contact_name_placeholder: "أدخل اسمك",
+                contact_email_label: "البريد الإلكتروني",
+                contact_email_placeholder: "أدخل بريدك الإلكتروني",
+                contact_message_label: "نطاق المشروع / الاستفسار",
+                contact_message_placeholder: "صف نوع الشراكة أو التحدي الذي تواجهه",
+                contact_submit_btn: "إرسال الرسالة",
+
+                footer_text1: '&copy; 2025 أحمد حويدة | مدير العمليات. تصميم Minimalist مبني على الأداء.',
+            }
+        };
+
+        // متغير لتخزين اللغة الحالية (القيمة الافتراضية هي الإنجليزية)
+        let currentLang = 'en';
+
+        // دالة تطبيق اللغة
+        function setLanguage(lang) {
+            const data = content[lang];
+            const body = document.body;
+            
+            // 1. تحديد اتجاه النص (Direction)
+            const dir = (lang === 'ar') ? 'rtl' : 'ltr';
+            body.setAttribute('dir', dir);
+            document.documentElement.setAttribute('lang', lang);
+
+            // 2. تحديث جميع النصوص
+            for (const key in data) {
+                const elements = document.querySelectorAll(`[data-i18n="${key}"]`);
+                elements.forEach(el => {
+                    el.innerHTML = data[key];
+                });
+
+                // تحديث الـ placeholders
+                const placeholderElements = document.querySelectorAll(`[data-i18n-placeholder="${key}"]`);
+                placeholderElements.forEach(el => {
+                    if (el.placeholder !== undefined) {
+                        el.placeholder = data[key];
+                    }
+                });
+            }
+
+            // 3. تحديث عنوان الصفحة
+            document.getElementById('page-title').textContent = data.page_title;
+            
+            // 4. تحديث زر اللغة (لإظهار اللغة المعاكسة)
+            const langButton = document.getElementById('lang-toggle-button');
+            langButton.textContent = (lang === 'ar') ? 'English' : 'العربية';
+            
+            currentLang = lang;
+        }
+
+        // دالة التبديل بين اللغات
+        function toggleLanguage() {
+            const newLang = (currentLang === 'en') ? 'ar' : 'en';
+            setLanguage(newLang);
+            // إغلاق قائمة الهاتف في حال كانت مفتوحة
+            const menu = document.getElementById('mobile-menu');
+            if (menu.classList.contains('mobile-menu-open')) {
+                toggleMenu();
+            }
+        }
+        
+        // دالة فتح/إغلاق قائمة التنقل للهاتف (تم نقلها هنا)
+        function toggleMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const button = document.getElementById('menu-button');
+            
+            menu.classList.toggle('mobile-menu-open');
+            
+            const isExpanded = menu.classList.contains('mobile-menu-open');
+            button.setAttribute('aria-expanded', isExpanded);
+        }
+
+
+        // ربط الدالة بزر القائمة وتطبيق اللغة الافتراضية عند تحميل الصفحة
+        window.onload = function() {
+            document.getElementById('menu-button').addEventListener('click', toggleMenu);
+            document.getElementById('lang-toggle-button').addEventListener('click', toggleLanguage); // تأكيد الربط
+
+            // إضافة event listener لجميع روابط القائمة داخل قائمة الهاتف لإغلاقها بعد النقر
+            const mobileLinks = document.querySelectorAll('#mobile-menu a');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    toggleMenu(); 
+                });
+            });
+
+            // تطبيق اللغة الإنجليزية كإعداد افتراضي عند التحميل
+            setLanguage(currentLang);
+        };
+    </script>
+</body>
+</html>
