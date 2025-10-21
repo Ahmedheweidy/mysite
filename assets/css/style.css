@@ -1,0 +1,323 @@
+/* assets/css/style.css */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap');
+:root {
+    font-family: 'Cairo', sans-serif;
+}
+/* التنسيق الأساسي للجسم */
+body {
+    background-color: #0d1117; /* GitHub dark mode style */
+    color: #e6edf3; /* Basic light text color */
+    line-height: 1.6;
+    transition: direction 0.3s;
+    scroll-behavior: smooth; /* إضافة التمرير السلس */
+}
+
+/* نمط خاص لبطاقات البيانات */
+.data-card {
+    background-color: #161b22; /* Slightly darker background for cards */
+    box-shadow: 0 4px 12px rgba(0, 255, 170, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.data-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 255, 170, 0.2);
+}
+
+/* لون مميز للـ ROI/النمو (Teal/أخضر مائي) */
+.accent-color {
+    color: #00ffaa;
+}
+.accent-bg {
+    background-color: #00ffaa;
+}
+.progress-bar {
+    height: 8px;
+    background-color: #2b333e;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    transition: width 1s ease-out;
+}
+
+/* تنسيق الخط الزمني (Timeline) */
+.timeline-item {
+    position: relative;
+    padding-bottom: 2.5rem;
+}
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    top: 1.5rem;
+    width: 16px;
+    height: 16px;
+    background-color: #0d1117;
+    border: 3px solid #00ffaa;
+    border-radius: 50%;
+    z-index: 10;
+}
+/* تنسيق الخط العمودي لـ RTL */
+[dir="rtl"] .timeline-item {
+    border-right: 4px solid #161b22;
+    padding-right: 2rem;
+    margin-right: 1rem;
+    text-align: right; 
+}
+[dir="rtl"] .timeline-item::before {
+    right: -10px;
+    left: auto;
+}
+[dir="rtl"] .timeline-item ul.list-disc {
+    list-style-position: inside; 
+    padding-right: 1rem; 
+    margin-right: 0rem; 
+    padding-left: 0;
+    margin-left: 0;
+}
+
+/* تنسيق الخط العمودي لـ LTR */
+[dir="ltr"] .timeline-item {
+    border-left: 4px solid #161b22;
+    padding-left: 2rem;
+    margin-left: 1rem;
+    text-align: left;
+}
+[dir="ltr"] .timeline-item::before {
+    left: -10px;
+    right: auto;
+}
+[dir="ltr"] .timeline-item ul.list-disc {
+    list-style-position: inside;
+    padding-left: 1rem;
+    margin-left: 0rem;
+    padding-right: 0;
+    margin-right: 0;
+}
+
+
+/* فاصل بصري أنيق */
+.section-divider {
+    height: 2px;
+    width: 10%;
+    background-color: #00ffaa;
+    margin: 4rem auto 0;
+    border-radius: 9999px;
+    opacity: 0.3;
+}
+/* تنسيق الأيقونة (لضمان عملها كزر) */
+.burger-icon {
+    cursor: pointer;
+    user-select: none;
+}
+/* تنسيق قائمة التنقل في وضع الهاتف */
+#mobile-menu {
+    transition: max-height 0.3s ease-out;
+    max-height: 0;
+    overflow: hidden;
+    background-color: #161b22;
+}
+.mobile-menu-open {
+    max-height: 500px !important; /* Sufficient height */
+}
+
+/* رسالة حالة النموذج */
+#form-status {
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+#form-status.visible {
+    opacity: 1;
+}
+.success {
+    background-color: #0e4431;
+    color: #00ffaa;
+}
+.error {
+    background-color: #4b0d11;
+    color: #f87171;
+}
+
+/* تنسيقات خاصة للوحة التحكم */
+.admin-section {
+    background-color: #1f2733;
+    padding: 2rem;
+    border-radius: 1rem;
+    margin-top: 2rem;
+}
+.admin-section input[type="text"],
+.admin-section textarea,
+.admin-section select,
+#login-modal input,
+#contact-form input,
+#contact-form textarea {
+    background-color: #0d1117;
+    border: 1px solid #30363d;
+    color: #e6edf3;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    text-align: inherit; 
+}
+/* Fix for UI editor inputs (ensure they are left aligned in LTR) */
+[dir="ltr"] #ui-editor-container input,
+[dir="ltr"] #ui-editor-container textarea {
+    text-align: left;
+}
+[dir="rtl"] #ui-editor-container input,
+[dir="rtl"] #ui-editor-container textarea {
+    text-align: right;
+}
+
+
+/* FIX: Ensure list items within project/testimonial cards align correctly in RTL */
+[dir="rtl"] .data-card ul {
+    text-align: right;
+    list-style-position: inside;
+    padding-right: 1rem;
+    padding-left: 0;
+}
+[dir="ltr"] .data-card ul {
+    text-align: left;
+    list-style-position: inside;
+    padding-left: 1rem;
+    padding-right: 0;
+}
+
+/* ------------------------------------------- */
+/* FIX: Header Controls & Nav Links Alignment */
+/* ------------------------------------------- */
+
+/* Control Buttons (Login/Lang) */
+[dir="ltr"] #header-controls button {
+    margin-left: 1rem; /* Default LTR spacing */
+    margin-right: 0;
+}
+[dir="rtl"] #header-controls {
+    /* FIX: Ensure buttons are visually ordered correctly (Language button first/left in RTL) */
+    flex-direction: row-reverse;
+    /* Apply spacing for RTL: margin-right for the element to the left */
+    justify-content: flex-end; /* Push to the right edge of the available space */
+}
+/* Apply margin to the right of the Language Button */
+[dir="rtl"] #header-controls button:first-of-type {
+    margin-right: 1rem;
+    margin-left: 0;
+}
+/* Ensure the Login/Logout button (second button) has no margin to its right */
+[dir="rtl"] #header-controls button:last-of-type {
+    margin-right: 0;
+    margin-left: 0;
+}
+
+
+/* Desktop Nav Links (The MD screen Nav links) */
+#desktop-nav-links a {
+    padding-left: 0.5rem; /* Base spacing for both directions, removed space-x-4 from HTML */
+    padding-right: 0.5rem;
+    margin-left: 1rem; /* Default spacing between links */
+    margin-right: 0;
+}
+[dir="rtl"] #desktop-nav-links a {
+    margin-right: 1rem; /* New RTL spacing */
+    margin-left: 0; /* Reset LTR margin */
+}
+/* Ensure the last link on the right (Blog in RTL) has no margin on its right side */
+[dir="rtl"] #desktop-nav-links a:first-child {
+    margin-right: 0;
+}
+[dir="ltr"] #desktop-nav-links a:last-child {
+    margin-left: 0;
+}
+
+
+/* ------------------------------------------- */
+/* FIX: Hero Buttons Spacing and Alignment in RTL */
+/* ------------------------------------------- */
+[dir="rtl"] #hero-text-container {
+    text-align: right !important;
+}
+
+[dir="rtl"] #hero-buttons {
+    justify-content: flex-end !important; 
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    flex-direction: row-reverse;
+}
+
+/* Apply correct spacing (1rem) between buttons in reverse order for desktop view */
+@media (min-width: 640px) {
+    [dir="rtl"] #hero-buttons > * {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    
+    /* Apply 1rem margin to the right of the visually leftmost button (which is the last one in DOM order) */
+    [dir="rtl"] #hero-buttons > *:not(:last-child) {
+        margin-right: 1rem !important; /* Spacing between the buttons */
+    }
+}
+
+
+[dir="rtl"] #hero-text-container .flex.space-x-6 {
+    justify-content: flex-end !important; /* Align social icons to the right in RTL desktop view */
+    flex-direction: row-reverse; /* Reverse flow for correct spacing/order */
+}
+/* Apply space-x-6 reversed manually to social icons */
+[dir="rtl"] #hero-text-container .flex.space-x-6 > * {
+    margin-left: 1.5rem !important;
+    margin-right: 0 !important;
+}
+[dir="rtl"] .data-card p {
+    text-align: right;
+}
+[dir="rtl"] .data-card h4 {
+    text-align: right;
+}
+
+/* Markdown style for full post view */
+#full-post-content {
+    line-height: 1.8;
+    text-align: inherit; 
+}
+#full-post-content h1, #full-post-content h2, #full-post-content h3 {
+    font-weight: bold;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    color: #00ffaa;
+    text-align: inherit;
+}
+#full-post-content p {
+    margin-bottom: 1em;
+    text-align: inherit;
+}
+#full-post-content ul {
+    list-style-type: disc;
+    list-style-position: inside;
+    padding-left: 1.5em; /* LTR fallback */
+}
+[dir="rtl"] #full-post-content ul {
+    padding-right: 1.5em; /* RTL padding */
+    padding-left: 0;
+}
+
+
+/* Login Modal */
+#login-modal { 
+    display: none;
+    align-items: center; 
+    justify-content: center;
+}
+#login-modal.show {
+     display: flex; 
+}
+/* Fix for icons where custom size class was missing in index.html */
+.text-3xl {
+    font-size: 1.875rem; 
+    line-height: 2.25rem;
+}
