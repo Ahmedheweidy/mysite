@@ -13,5 +13,6 @@ export const firebaseConfig = {
 };
 
 // **هام:** هذا هو الإيميل المسموح له بفتح لوحة التحكم (يجب أن يكون مستخدم مسجل في Firebase Auth)
-export const ADMIN_EMAIL = "ahmedheweide@gmail.com";
+export const ADMIN_EMAIL = "ahmed.heweide@gmail.com";
+
 
